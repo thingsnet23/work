@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<!-- Mirrored from biz.yap.net/news.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 03 Jul 2023 02:48:44 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="assets/css/pc/style.css">
+    <link rel="stylesheet" href="news.css">
+    <script src="assets/js/library/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <title>NEWS</title>
+</head>
+<body>
+<div class="wrap" id="wrap">
+    <header id="header" class="header">
+        <div class="container clearfix">
+            <div class="logo back-top">
+                <a href="index-2.html"><img src="assets/img/pc/thingsnet.co.kr.png" alt="yap"></a>
+            </div>
+            <div class="header_right">
+                <nav class="gnb pull-left">
+                    <ul class="nav_list clearfix">
+                        <li class="nav_item">
+                            <a href="index-2.html#content_about" class="nav_link" data-nav=".content_about">
+                                About
+                            </a>
+                        </li>
+                        <li class="nav_item">
+                            <a href="index-2.html#content_tech" class="nav_link" data-nav=".content_tech">
+                                tech
+                            </a>
+                        </li>
+                        <li class="nav_item">
+                            <a href="index-2.html#content_strategy" class="nav_link" data-nav=".content_strategy">
+                                BIZ
+                            </a>
+                        </li>
+                        <li class="nav_item">
+                            <a href="index-2.html#content_core" class="nav_link" data-nav=".content_core">
+                                service
+                            </a>
+                        </li>
+                        <li class="nav_item nav_pr">
+                            <a href="index-2.html#content_pr" class="nav_link" data-nav=".content_pr">
+                                PR
+                            </a>
+                            <div class="dropdown-content">
+                                <a href="news.html" class="dropdown nav_news is-active">NEWS</a>
+                                <a href="media.html" class="dropdown nav_media">MEDIA</a>
+                            </div>
+                        </li>
+                        <li class="nav_item">
+                            <a href="index-2.html#content_company" class="nav_link" data-nav=".content_company">
+                                location
+                            </a>
+                        </li>
+                        <li class="nav_item">
+                            <a href="assets/brochure/brochure_kor.pdf" target="_blank" class="nav_link">
+                                Brochure
+                            </a>
+                        </li>
+                        <li class="nav_item">
+                            <div class="select_lang pull-left">
+                                <a href="index-2.html" class="btn_kr btn_lang is-active">
+                                    KR
+                                </a>
+                                <a href="en/index.html" class="btn_en btn_lang">
+                                    EN
+                                </a>
+                                <a href="jp/index.html" class="btn_en btn_lang">
+                                    JP
+                                </a>
+                                <a href="ch/index.html" class="btn_en btn_lang">
+                                    CH
+                                </a>
+                            </div>
+                        </li>
+                        <li class="nav_item">
+                            <a href="index-2.html#qna" class="nav_link" data-nav=".qna">
+                                문의하기
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div id="news_wrapper">
+        <div class="contents_top">
+            <div class="news_h1">
+                <h1>NEWS</h1>
+            </div>
+            <div class="news_search">
+                <div class="search-container">
+                    <button type="button" id="searchBtn" style="width: 35px; height: 35px;"><img src="icon_search.png"
+                                                                                                 alt=""></button>
+                    <input type="text" placeholder="검색어를 입력해주세요" id="searchStr" name="search"
+                           style="width: 250px; height: 35px;">
+                </div>
+            </div>
+        </div>
+        <div class="contents_bottom">
+            <ul class="contents_bottom_box" id="newsUl">
+            </ul>
+            <div class="pg_contents">
+                <ul class="pg_btn" id="pageUl">
+                </ul>
+            </div>
+        </div>
+    </div>
+    <footer> <!-- 본문 푸터 -->
+        <address><strong>(주)얍컴퍼니</strong> 서울특별시 종로구 율곡로 88, 삼환빌딩 10F</address>
+        <p class="copyright">
+            <small>Copyright &copy; YAP All rights reserved.</small>
+        </p>
+    </footer>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var sBtn = $(".pg_btn");   //  ul > li 이를 sBtn으로 칭한다. (클릭이벤트는 li에 적용 된다.)
+        var activeBtn = $(".pg_btn a");
+        sBtn.find("a").click(function () { // sBtn에 속해 있는  a 찾아 클릭 하면.
+            activeBtn.removeClass("btn_active");     // sBtn 속에 (active) 클래스를 삭제 한다.
+            $(this).addClass("btn_active"); // 클릭한 a에 (active)클래스를 넣는다.
+        })
+    });
+
+    var apiUrl = 'https://dev-app.yap.net/homp/';
+
+
+    var nowPage = '';
+
+    $(document).ready(function () {
+
+
+        getNewsList();
+
+        $("#searchBtn").on("click", function () {
+            var keyword = $("#searchStr").val();
+            getNewsList(1, keyword);
+        });
+
+        $("#searchStr").keypress(function (key) {
+
+            if (key.keyCode == 13) {
+                var keyword = $("#searchStr").val();
+                getNewsList(1, keyword);
+            }
+        });
+    });
+
+    function getNewsList(page, keyword) {
+        var xhr = new XMLHttpRequest();
+        var fd = new FormData();
+
+        console.log("검색어 : " + keyword);
+
+        if (page == null || page == '') {
+            page = 1;
+        }
+
+        if (keyword == null || keyword == "") {
+            keyword = "";
+        }
+
+        $("#searchStr").val(keyword);
+
+        nowPage = page;
+
+        console.log(page);
+
+        fd.append("page", page);
+        fd.append("keyword", keyword);
+        fd.append("listSize", 12);
+
+        xhr.open('POST.html', apiUrl + 'getNewsList');
+        xhr.addEventListener("load", makeDiv);
+        xhr.send(fd);
+
+        console.log(xhr);
+    }
+
+    function makeDiv() {
+        console.log(nowPage);
+        var list = JSON.parse(this.response);
+
+        var newsList = list.newsList;
+        var pageInfo = list.pageInfo;
+
+        var div = '';
+        var pageDiv = '';
+/*
+
+        if (nowPage == 1) {
+
+            var tempPDFNews02 = {
+                newsDesc: "당사의 2020. 09. 23.자 신주발행공고 관련하여, 관계기관과의 협의 결과 등에 따라\n" +
+                    "아래와 같이 일정을 변경하오니 착오 없으시기 바랍니다. ",
+                newsImgUrl: "http://biz.yap.net.s3-ap-northeast-2.amazonaws.com/assets/img/img_logo.jpg", //이미지 주소
+                newsPubYmd: "2020-10-08",
+                newsTitle: "[공고] 얍컴퍼니 정정 공고(신주발행공고)",
+                newsUrl: "http://biz.yap.net.s3-ap-northeast-2.amazonaws.com/assets/brochure/brochure_new_02.pdf" //PDF 주소
+            };
+
+            var tempPDFNews = {
+                newsDesc: "상법 제416조에 의거 2020. 9. 23. 개최한 당사 이사회에서 유상증자에 따른\n" +
+                    "신주발행에 관하여 아래와 같이 결의하였기에 공고합니다.",
+                newsImgUrl: "http://biz.yap.net.s3-ap-northeast-2.amazonaws.com/assets/img/img_logo.jpg", //이미지 주소
+                newsPubYmd: "2020-09-23",
+                newsTitle: "[공고] 얍컴퍼니 신주발행공고",
+                newsUrl: "http://biz.yap.net.s3-ap-northeast-2.amazonaws.com/assets/brochure/brochure_new.pdf" //PDF 주소
+            };
+
+            newsList.unshift(tempPDFNews);
+            newsList.unshift(tempPDFNews02);
+            newsList.splice(newsList.length - 2);
+        }
+*/
+
+
+        for (var i = 0; i < newsList.length; i++) {
+            div += '<li><a href="' + newsList[i].newsUrl + '" target="_blank"><img src="' + newsList[i].newsImgUrl + '" width="80%" height="80%" alt="기사 썸네일">';
+            div += '<p class="pr_title">' + newsList[i].newsTitle + '</p>';
+            div += '<p class="pr_txt">' + newsList[i].newsDesc + '</p>';
+            div += '<p class="pr_date">' + newsList[i].newsPubYmd + '</p></a></li>';
+        }
+
+        console.log(pageInfo);
+
+        var keyword = pageInfo.keyword;
+
+        if (pageInfo.prev) {
+            var prevRange = pageInfo.startPage - 1;
+            pageDiv += '<li class="btn_box btn_prev"><a href="javascript:getNewsList(' + prevRange + ', \'' + keyword + '\')"  target=""><img src="btn_prev.png" class="btn_img" alt="previous button"> Prev</a></li>';
+        } else {
+            $(".btn_prev").css("display", "none");
+        }
+
+        for (var i = pageInfo.startPage; i <= pageInfo.endPage; i++) {
+            if (i == nowPage) {
+                pageDiv += '<li><a href="javascript:getNewsList(' + i + ', \'' + keyword + '\')" class="btn_active"><strong>' + i + '</strong></a></li>';
+            } else {
+                pageDiv += '<li><a href="javascript:getNewsList(' + i + ', \'' + keyword + '\')"><strong>' + i + '</strong></a></li>';
+            }
+        }
+
+        if (pageInfo.next) {
+            var nextRange = pageInfo.endPage + 1;
+
+            pageDiv += '<li class="btn_box btn_next"><a href="javascript:getNewsList(' + nextRange + ', \'' + keyword + '\')">Next <img src="btn_next.png" class="btn_img" alt="next button"></a></li>';
+        }
+
+        $("#newsUl").html(div);
+        $("#pageUl").html(pageDiv);
+    }
+</script>
+</body>
+
+<!-- Mirrored from biz.yap.net/news.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 03 Jul 2023 02:48:45 GMT -->
+</html>
